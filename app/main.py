@@ -1,95 +1,57 @@
-import tkinter as tk
+import  tkinter as tk
 from tkinter import ttk
+import customtkinter
+import sqlite3
+import sys
+import customtkinter as ctk
 
+from windows import AddTaskWindow
 
-import os 
-import json
-
-from tkcalendar import Calendar
-from customtkinter import *
-
-from menu import Menu
-from frame import Frame, ViewFrame, TaskFrame
-
-
-from PIL import ImageTk, Image
-base_path = os.getcwd()
-print(base_path)
-
-
-
-
-
-class App(tk.Tk):
-    def __init__(self, master=None, *args, **kwargs):
-        super().__init__(master, *args, **kwargs)
-        
-       
-        self.title('To Do App')
-        self.geometry('720x480')
-        self.set_ui()
-        self.bind("<Escape>", lambda e:  self.quit())
-
+class App(ctk.CTk):
+    def __init__(self, title):
+        super().__init__()
+        self.title('Todo App')
+        self.geometry("500x500")
+        self.bind("<Escape>", lambda e: self.destroy)
+        self.setup_ui()
     
-    def window_config(self):
-        self.attributes('')
+        # self.menu = tk.Menu(self)
+        # self.add_task = tk.Menu(self.menu)
+        # self.menu.add_cascade(label="File", menu=self.add_task)
+        # self.add_task.add_command(label="Add Task")
 
 
-    def add_task(self):
+        # self.update_task = tk.Menu(self.menu)
+        # self.menu.add_cascade(label="Update", menu=self.update_task)
+        # self.update_task.add_command(label="Update Task")
+
         
-        from db import add_task
+        # self.config(menu=self.menu)
 
-        add_task(self.task.get(),  self.status.get(), '2024-12-17')
+    def setup_ui(self):
         
-    def view_current_task(self):
-        from db import sort_by_not_done
-        print(sort_by_not_done())
-        
-    def set_style(self):
-        self.style = ttk.Style()
-        self.style.configure("TButton",
-                font=("Helvetica", 12),
-                padding=10,
-                background="#88C0D0",
-                foreground="#2E3440",
-                borderwidth=0)
-        self.style.map("TButton",
-          background=[("active", "#5E81AC")],
-          foreground=[("active", "white")])
+        self.add_task = customtkinter.CTkButton(self, text="Add Task", command=self.show_add_task_window)
+        self.update_task = customtkinter.CTkButton(self, text="Update Task", command=self.show_update_task_window)
 
-# Label Style
-        self.style.configure("TLabel",
-                font=("Helvetica", 14),
-                foreground="white",
-                background="#2E3440")
+        self.add_task.pack(side=tk.LEFT)
+        self.update_task.pack(side=tk.LEFT)
+
+    def show_add_task_window(self):
+        add = AddTaskWindow(self)
+
+    def show_update_task_window(self):
+        pass
+
+    def connect_to_db(self):
+        conn = sqlite3.connect("todo.db")
+        return conn
 
 
-    def set_ui(self):
-        self.configure(bg='#1c2322')
-        self.title_label = CTkLabel(self, text="To Do App")
-        self.columnconfigure(0, weight=1)
-        self.task_parent = CTkFrame(self)
-        self.main_frame = CTkFrame(self)      
-        self.main_frame.pack()
-        self.task_parent.pack()
-        self.frame = Frame(self.main_frame)
-        self.task = TaskFrame(self.task_parent)
-        self.frame.setup()
-        self.task.setup()
+    def destroy(self):
+        sys.exit()
+        return super().destroy()
+    
 
-
-
-    def get_option(self, choice):
-        self.status
-        # print(choice)
-
-
-    def run(self):
-        self.mainloop()
-
-
-app= App()
-task = tk.StringVar()
-status = tk.StringVar(value='Not Done')
-
-app.run()
+if __name__ == "__main__":
+    app = App("Todo App")
+    app.mainloop()
